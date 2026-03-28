@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sagol 360 – Desktop v2</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #7c3aed;
+      --purple-light: #ede9fe;
+      --purple-dark: #5b21b6;
+      --orange: #f97316;
+      --orange-gradient: linear-gradient(135deg, #f97316, #ef4444);
+      --purple-gradient: linear-gradient(135deg, #7c3aed, #6d28d9);
+      --bg: #f5f4ff;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --nav-h: 68px;
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      z-index: 100;
+      gap: 0;
+    }
+
+    .nav-logo {
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--purple);
+      letter-spacing: -0.5px;
+      margin-left: 40px;
+      white-space: nowrap;
+    }
+    .nav-logo span { color: var(--orange); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 18px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .nav-link:hover { background: var(--purple-light); color: var(--purple); }
+    .nav-link.active {
+      background: var(--purple-light);
+      color: var(--purple);
+      font-weight: 700;
+    }
+    .nav-link .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--purple);
+      display: none;
+    }
+    .nav-link.active .dot { display: block; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-right: auto;
+    }
+    .nav-greeting {
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    .nav-greeting strong { color: var(--text); }
+
+    .nav-bell {
+      position: relative;
+      cursor: pointer;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--purple-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      border: none;
+    }
+    .nav-bell .badge {
+      position: absolute;
+      top: 3px; left: 3px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 0.58rem;
+      font-weight: 700;
+      width: 15px; height: 15px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .nav-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--purple-gradient);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+
+    .nav-add-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      background: var(--purple-gradient);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .nav-add-btn:hover { opacity: 0.9; }
+
+    /* ── PAGE ── */
+    .page {
+      padding-top: calc(var(--nav-h) + 32px);
+      padding-bottom: 48px;
+      padding-left: 40px;
+      padding-right: 40px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* ── TAB PANELS ── */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .page-header h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+    .page-header .date {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+    }
+    .card-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+    }
+
+    /* ── DASHBOARD ── */
+    /* Hero banner */
+    .hero {
+      background: var(--purple-gradient);
+      border-radius: 20px;
+      padding: 32px 36px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      margin-bottom: 24px;
+    }
+    .hero-text { flex: 1; }
+    .hero-text .greeting { font-size: 1rem; opacity: 0.85; margin-bottom: 6px; }
+    .hero-text h2 { font-size: 2rem; font-weight: 900; margin-bottom: 8px; }
+    .hero-text p { opacity: 0.85; font-size: 0.95rem; }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.82rem;
+      margin-top: 12px;
+    }
+    .hero-progress {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .hero-progress .ring-wrap { position: relative; }
+    .hero-progress svg { transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: rgba(255,255,255,0.25); stroke-width: 10; }
+    .ring-val { fill: none; stroke: #fff; stroke-width: 10; stroke-linecap: round; }
+    .ring-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .ring-text .num { font-size: 1.7rem; font-weight: 800; color: #fff; }
+    .ring-text .denom { font-size: 0.72rem; color: rgba(255,255,255,0.75); }
+    .hero-progress .label { font-size: 0.82rem; opacity: 0.85; }
+
+    .hero-next {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 14px;
+      padding: 20px 24px;
+      min-width: 260px;
+    }
+    .hero-next .next-label { font-size: 0.78rem; opacity: 0.8; margin-bottom: 8px; }
+    .hero-next h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; }
+    .hero-next .meta { font-size: 0.83rem; opacity: 0.9; margin-bottom: 14px; display: flex; flex-direction: column; gap: 4px; }
+    .appt-actions { display: flex; gap: 10px; }
+    .btn {
+      padding: 9px 20px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-white { background: #fff; color: var(--purple); }
+    .btn-outline-white { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,0.5); }
+    .btn-purple { background: var(--purple-gradient); color: #fff; }
+    .btn-orange { background: var(--orange-gradient); color: #fff; }
+    .btn-ghost { background: var(--bg); color: var(--muted); }
+
+    /* 4-col stats */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .stat-icon-wrap {
+      width: 46px; height: 46px;
+      border-radius: 12px;
+      background: var(--purple-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .stat-info .val { font-size: 1.5rem; font-weight: 800; color: var(--purple); }
+    .stat-info .lbl { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+
+    /* Bottom 3-col row */
+    .bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* Brain training */
+    .brain-card {
+      background: var(--orange-gradient);
+      border-radius: 18px;
+      padding: 24px;
+      color: #fff;
+    }
+    .brain-card .bc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .brain-card h3 { font-size: 1rem; font-weight: 700; margin-top: 4px; }
+    .brain-nums { font-size: 2rem; font-weight: 800; }
+    .brain-nums span { font-size: 0.85rem; opacity: 0.8; }
+    .progress-bar-wrap { background: rgba(255,255,255,0.3); border-radius: 10px; height: 7px; margin-bottom: 16px; }
+    .progress-bar { background: #fff; height: 7px; border-radius: 10px; width: 50%; }
+    .btn-brain {
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      border: 1.5px solid rgba(255,255,255,0.45);
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* Tip */
+    .tip-card { background: #fffbeb; border: 1px solid #fde68a; border-radius: 18px; padding: 22px; }
+    .tip-card .tip-icon { font-size: 1.6rem; margin-bottom: 8px; }
+    .tip-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .tip-card p { font-size: 0.87rem; color: #78350f; line-height: 1.65; }
+
+    /* ── SCHEDULE ── */
+    .schedule-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .week-strip { display: flex; gap: 8px; margin-bottom: 20px; }
+    .day-btn {
+      flex: 1;
+      padding: 10px 4px;
+      border-radius: 12px;
+      border: none;
+      background: var(--bg);
+      cursor: pointer;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+    .day-btn.active { background: var(--purple); color: #fff; font-weight: 700; }
+    .day-btn .day-name { display: block; font-size: 0.7rem; opacity: 0.7; margin-bottom: 2px; }
+    .day-btn.active .day-name { opacity: 0.8; color: #fff; }
+
+    .section-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 16px 0 8px;
+    }
+    .event-card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      border-right: 4px solid var(--purple);
+      margin-bottom: 10px;
+    }
+    .event-card.blue { border-color: #3b82f6; }
+    .event-card.green { border-color: #22c55e; }
+    .event-card.orange { border-color: var(--orange); }
+    .event-card.yellow { border-color: #eab308; }
+    .event-time-col { min-width: 72px; }
+    .event-time-col .time { font-size: 1rem; font-weight: 700; }
+    .event-time-col .dur { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .event-info { flex: 1; }
+    .event-info h4 { font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; }
+    .event-info p { font-size: 0.82rem; color: var(--muted); }
+
+    /* ── LIFESTYLE ── */
+    .lifestyle-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+    .lifestyle-layout .wide { grid-column: span 3; }
+    .tab-switch { display: flex; background: var(--bg); border-radius: 12px; padding: 4px; margin-bottom: 18px; width: fit-content; }
+    .tab-sw-btn { padding: 7px 18px; border-radius: 10px; border: none; cursor: pointer; font-size: 0.88rem; background: transparent; color: var(--muted); font-weight: 500; }
+    .tab-sw-btn.active { background: #fff; color: var(--purple); font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .food-item { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .food-item:last-child { border-bottom: none; }
+    .food-emoji { font-size: 2rem; width: 48px; text-align: center; }
+    .food-info h4 { font-size: 0.92rem; font-weight: 700; }
+    .food-info p { font-size: 0.8rem; color: var(--muted); }
+    .diet-tip { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 14px; padding: 18px; }
+    .diet-tip .tip-header { font-weight: 700; font-size: 0.9rem; color: #166534; margin-bottom: 10px; }
+    .diet-tip ul { padding-right: 18px; }
+    .diet-tip ul li { font-size: 0.83rem; color: #166534; line-height: 1.8; }
+
+    /* ── METRICS ── */
+    .metrics-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .chart-placeholder {
+      background: var(--bg);
+      border-radius: 12px;
+      height: 150px;
+      display: flex;
+      align-items: flex-end;
+      padding: 16px 10px 10px;
+      gap: 8px;
+    }
+    .bar { background: var(--purple-light); border-radius: 4px 4px 0 0; flex: 1; cursor: pointer; transition: background 0.2s; }
+    .bar:hover, .bar.today { background: var(--purple); }
+    .chart-labels { display: flex; gap: 8px; margin-top: 4px; }
+    .chart-label { flex: 1; text-align: center; font-size: 0.7rem; color: var(--muted); }
+    .chart-legend { display: flex; gap: 16px; margin-top: 10px; font-size: 0.8rem; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-left: 6px; }
+
+    .slider-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .slider-row:last-of-type { border-bottom: none; }
+    .slider-icon { font-size: 1.2rem; width: 26px; text-align: center; flex-shrink: 0; }
+    .slider-info { flex: 1; }
+    .slider-info h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 6px; }
+    .slider-track { background: var(--border); border-radius: 10px; height: 6px; }
+    .slider-fill { background: var(--purple); height: 6px; border-radius: 10px; }
+    .slider-ends { display: flex; justify-content: space-between; font-size: 0.68rem; color: var(--muted); margin-top: 3px; }
+    .slider-val { min-width: 46px; text-align: left; font-weight: 700; color: var(--purple); font-size: 0.92rem; }
+    .send-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--purple-gradient);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .send-btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+
+<!-- ── TOP NAVBAR ── -->
+<nav>
+  <div class="nav-logo">Sagol <span>360</span></div>
+
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showTab('dashboard', this)">
+      <span class="dot"></span> 🏠 ראשי
+    </button>
+    <button class="nav-link" onclick="showTab('schedule', this)">
+      <span class="dot"></span> 📅 לו״ז
+    </button>
+    <button class="nav-link" onclick="showTab('lifestyle', this)">
+      <span class="dot"></span> ⚡ אורח חיים
+    </button>
+    <button class="nav-link" onclick="showTab('metrics', this)">
+      <span class="dot"></span> 📊 מדדים
+    </button>
+  </div>
+
+  <div class="nav-right">
+    <button class="nav-add-btn" onclick="alert('הוספת פעולה חדשה')">＋ הוסף</button>
+    <button class="nav-bell">🔔<span class="badge">2</span></button>
+    <div class="nav-greeting">שלום, <strong>ישראל</strong></div>
+    <div class="nav-avatar">יש</div>
+  </div>
+</nav>
+
+<!-- ── PAGE CONTENT ── -->
+<div class="page">
+
+  <!-- ════════════════ DASHBOARD ════════════════ -->
+  <div id="tab-dashboard" class="tab-panel active">
+    <div class="page-header">
+      <div>
+        <h1>לוח הבקרה</h1>
+        <div class="date">שבת, 28 מרץ 2026 &nbsp;•&nbsp; 17:18</div>
+      </div>
+    </div>
+
+    <!-- Hero banner -->
+    <div class="hero">
+      <div class="hero-text">
+        <div class="greeting">ערב טוב,</div>
+        <h2>ישראל 👋</h2>
+        <p>אתה בדרך הנכונה! כבר השלמת 15 טיפולים מתוך 60.</p>
+        <span class="hero-badge">כל הכבוד על ההתמדה! 🎉</span>
+      </div>
+
+      <div class="hero-progress">
+        <div class="ring-wrap">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle class="ring-bg" cx="55" cy="55" r="46"/>
+            <circle class="ring-val" cx="55" cy="55" r="46"
+              stroke-dasharray="289.0"
+              stroke-dashoffset="216.8"/>
+          </svg>
+          <div class="ring-text">
+            <div class="num">15</div>
+            <div class="denom">מתוך 60</div>
+          </div>
+        </div>
+        <div class="label">פרוטוקול 60</div>
+      </div>
+
+      <div class="hero-next">
+        <div class="next-label">התור הבא • היום</div>
+        <h3>טיפול בתא לחץ</h3>
+        <div class="meta">
+          <span>🕐 19:18 &nbsp;•&nbsp; ⏱ 2 שעות</span>
+          <span>📍 תא כתום &nbsp;•&nbsp; 🏢 בניין אריסון</span>
+        </div>
+        <div class="appt-actions">
+          <button class="btn btn-white" style="flex:1">בצע צ׳ק-אין</button>
+          <button class="btn btn-outline-white">לא מגיע</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 stat cards -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon-wrap">🎯</div>
+        <div class="stat-info">
+          <div class="val">15</div>
+          <div class="lbl">טיפולים הושלמו</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-wrap" style="background:#fff7ed">📅</div>
+        <div class="stat-info">
+          <div class="val" style="color:var(--orange)">45</div>
+          <div class="lbl">טיפולים נותרו</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-wrap">⚡</div>
+        <div class="stat-info">
+          <div class="val">5/10</div>
+          <div class="lbl">רמת אנרגיה היום</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon-wrap">🌙</div>
+        <div class="stat-info">
+          <div class="val">5/10</div>
+          <div class="lbl">איכות שינה</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom row -->
+    <div class="bottom-row">
+      <div class="brain-card">
+        <div class="bc-top">
+          <div>
+            <div class="card-label" style="color:rgba(255,255,255,0.75)">אימון מוחי</div>
+            <h3>🧠 BrainHQ</h3>
+          </div>
+          <div style="text-align:left">
+            <div class="brain-nums">15 <span>דק׳</span></div>
+            <div style="font-size:0.75rem;opacity:0.8">מתוך 30</div>
+          </div>
+        </div>
+        <div style="font-size:0.8rem;opacity:0.8;margin-bottom:6px">יעד יומי: 30 דקות</div>
+        <div class="progress-bar-wrap"><div class="progress-bar"></div></div>
+        <div class="btn-brain" onclick="window.open('https://www.brainhq.com','_blank')">פתח את BrainHQ ↗</div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-icon">💡</div>
+        <div class="card-label">טיפ יומי</div>
+        <h4>חמצן ושינה</h4>
+        <p>הידעת? חמצון משופר יכול להעמיק את מחזורי השינה. מומלץ לבדוק את נתוני השינה שלך בטאב "המדדים שלי".</p>
+      </div>
+
+      <div class="card">
+        <div class="card-label">פרוטוקול טיפולי</div>
+        <div style="margin-bottom:14px">
+          <strong style="font-size:1rem">פרוטוקול 60</strong>
+          <p style="font-size:0.85rem;color:var(--muted);margin-top:3px">טיפול בתא לחץ</p>
+        </div>
+        <div style="background:var(--bg);border-radius:10px;height:10px;margin-bottom:8px">
+          <div style="background:var(--purple);height:10px;border-radius:10px;width:25%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.8rem;color:var(--muted)">
+          <span>0</span><span>15 / 60</span><span>60</span>
+        </div>
+        <div style="margin-top:16px;font-size:0.85rem;color:var(--muted)">
+          השלמת <strong style="color:var(--purple)">25%</strong> מהפרוטוקול
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ SCHEDULE ════════════════ -->
+  <div id="tab-schedule" class="tab-panel">
+    <div class="page-header">
+      <div><h1>הלו״ז שלי</h1><div class="date">מרץ 2026</div></div>
+    </div>
+
+    <!-- Week strip at the top -->
+    <div class="card" style="margin-bottom:24px">
+      <div class="week-strip">
+        <button class="day-btn"><span class="day-name">א׳</span>22</button>
+        <button class="day-btn"><span class="day-name">ב׳</span>23</button>
+        <button class="day-btn"><span class="day-name">ג׳</span>24</button>
+        <button class="day-btn"><span class="day-name">ד׳</span>25</button>
+        <button class="day-btn"><span class="day-name">ה׳</span>26</button>
+        <button class="day-btn"><span class="day-name">ו׳</span>27</button>
+        <button class="day-btn active"><span class="day-name">ש׳</span>28</button>
+      </div>
+    </div>
+
+    <div class="schedule-layout">
+      <!-- Today -->
+      <div>
+        <div class="section-label">היום – שבת 28 מרץ</div>
+        <div class="event-card">
+          <div class="event-time-col">
+            <div class="time">19:18</div>
+            <div class="dur">⏱ 2 שעות</div>
+          </div>
+          <div class="event-info">
+            <h4>טיפול בתא לחץ</h4>
+            <p>📍 תא כתום &nbsp;•&nbsp; 🏢 בניין אריסון</p>
+          </div>
+          <button class="btn btn-purple">צ׳ק-אין</button>
+          <button class="btn btn-ghost" style="margin-right:6px">לא מגיע</button>
+        </div>
+
+        <div class="section-label">מחר – ראשון 29 מרץ</div>
+        <div class="event-card blue">
+          <div class="event-time-col">
+            <div class="time">10:00</div>
+            <div class="dur">⏱ 45 דק׳</div>
+          </div>
+          <div class="event-info">
+            <h4>הערכה קוגניטיבית</h4>
+            <p>📍 חדר 102</p>
+          </div>
+        </div>
+        <div class="event-card green">
+          <div class="event-time-col">
+            <div class="time">11:30</div>
+            <div class="dur">⏱ 30 דק׳</div>
+          </div>
+          <div class="event-info">
+            <h4>פיזיותרפיה</h4>
+            <p>📍 מכון פיזיותרפיה</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- This week -->
+      <div>
+        <div class="section-label">בשבוע הקרוב</div>
+        <div class="event-card">
+          <div class="event-time-col">
+            <div class="time">09:00</div>
+            <div class="dur">⏱ 2 שעות</div>
+          </div>
+          <div class="event-info">
+            <h4>טיפול בתא לחץ</h4>
+            <p>📍 תא אדום</p>
+          </div>
+        </div>
+        <div class="event-card orange">
+          <div class="event-time-col">
+            <div class="time">08:30</div>
+            <div class="dur">⏱ 1 שעה</div>
+          </div>
+          <div class="event-info">
+            <h4>בדיקת מאמץ</h4>
+            <p>📍 חדר בדיקות</p>
+          </div>
+        </div>
+        <div class="event-card yellow">
+          <div class="event-time-col">
+            <div class="time">14:00</div>
+            <div class="dur">⏱ 45 דק׳</div>
+          </div>
+          <div class="event-info">
+            <h4>דימות MRI</h4>
+            <p>📍 מכון דימות</p>
+          </div>
+        </div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:12px;text-align:center">
+          📅 מעודכן ליום 28/03/2026 בשעה 17:18
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ LIFESTYLE ════════════════ -->
+  <div id="tab-lifestyle" class="tab-panel">
+    <div class="page-header">
+      <div><h1>אורח חיים</h1></div>
+    </div>
+
+    <!-- Brain wide -->
+    <div class="brain-card" style="margin-bottom:24px;flex-direction:row;display:flex;align-items:center;gap:36px;padding:28px 36px">
+      <div style="flex:1">
+        <div class="card-label" style="color:rgba(255,255,255,0.75)">אימון מוחי יומי</div>
+        <h3 style="font-size:1.15rem;margin-bottom:8px">🧠 BrainHQ</h3>
+        <div style="font-size:0.85rem;opacity:0.8;margin-bottom:8px">יעד יומי: 30 דקות</div>
+        <div class="progress-bar-wrap" style="margin-bottom:0"><div class="progress-bar"></div></div>
+      </div>
+      <div style="text-align:left;flex-shrink:0">
+        <div class="brain-nums" style="font-size:2.5rem">15 <span>דק׳</span></div>
+        <div style="font-size:0.82rem;opacity:0.8;margin-bottom:14px">מתוך 30</div>
+        <div class="btn-brain" style="width:auto;padding:10px 24px" onclick="window.open('https://www.brainhq.com','_blank')">פתח את BrainHQ ↗</div>
+      </div>
+    </div>
+
+    <div class="lifestyle-layout">
+      <!-- Nutrition -->
+      <div class="card" style="grid-column:span 2">
+        <div class="tab-switch">
+          <button class="tab-sw-btn active">תזונה</button>
+          <button class="tab-sw-btn">פיזיותרפיה ואימונים</button>
+        </div>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 16px;font-size:0.85rem;color:#1e40af;margin-bottom:18px">
+          ℹ️ התפריט מותאם אישית להפחתת דלקתיות ואיזון רמות סוכר. מומלץ להרבות בשתיית מים.
+        </div>
+        <h4 style="font-size:0.85rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">ארוחת צהריים מומלצת</h4>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div class="food-item" style="flex-direction:column;text-align:center;border:none;background:var(--bg);border-radius:14px;padding:16px">
+            <div style="font-size:2.5rem;margin-bottom:8px">🐟</div>
+            <div class="food-info"><h4>סלמון צרוב</h4><p>עשיר באומגה-3</p></div>
+          </div>
+          <div class="food-item" style="flex-direction:column;text-align:center;border:none;background:var(--bg);border-radius:14px;padding:16px">
+            <div style="font-size:2.5rem;margin-bottom:8px">🥗</div>
+            <div class="food-info"><h4>סלט ירקות</h4><p>אנטי דלקתי טבעי</p></div>
+          </div>
+          <div class="food-item" style="flex-direction:column;text-align:center;border:none;background:var(--bg);border-radius:14px;padding:16px">
+            <div style="font-size:2.5rem;margin-bottom:8px">🍵</div>
+            <div class="food-info"><h4>תה ירוק</h4><p>נוגד חמצון חזק</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tips column -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="diet-tip">
+          <div class="tip-header">🥗 מותאם לאיזון סוכר</div>
+          <ul>
+            <li>ארוחת בוקר: ביצים עם אבוקדו וירקות</li>
+            <li>חטיף: אגוזים מעורבים (חופן קטן)</li>
+            <li>ארוחת צהריים: סלמון עם ירקות אפויים</li>
+            <li>ארוחת ערב: חזה עוף עם סלט ירוק</li>
+          </ul>
+        </div>
+        <div class="tip-card">
+          <div class="tip-icon">💧</div>
+          <h4>שתיית מים</h4>
+          <p>שתייה מספקת לפני הטיפול תשפר את יעילות הטיפול בחמצן היפרברי.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ METRICS ════════════════ -->
+  <div id="tab-metrics" class="tab-panel">
+    <div class="page-header">
+      <div><h1>המדדים שלי <span style="font-size:1.1rem;color:var(--muted);font-weight:500">(PROMs)</span></h1></div>
+    </div>
+
+    <div class="metrics-layout">
+      <!-- Chart -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="card-label">מגמות שבועיות</div>
+          <select style="font-size:0.8rem;padding:5px 10px;border-radius:8px;border:1px solid var(--border);color:var(--muted)">
+            <option>7 ימים אחרונים</option>
+            <option>30 ימים אחרונים</option>
+          </select>
+        </div>
+        <div class="chart-placeholder">
+          <div class="bar" style="height:40%"></div>
+          <div class="bar" style="height:55%"></div>
+          <div class="bar" style="height:45%"></div>
+          <div class="bar" style="height:60%"></div>
+          <div class="bar" style="height:50%"></div>
+          <div class="bar" style="height:65%"></div>
+          <div class="bar today" style="height:50%"></div>
+        </div>
+        <div class="chart-labels">
+          <div class="chart-label">א׳</div>
+          <div class="chart-label">ב׳</div>
+          <div class="chart-label">ג׳</div>
+          <div class="chart-label">ד׳</div>
+          <div class="chart-label">ה׳</div>
+          <div class="chart-label">ו׳</div>
+          <div class="chart-label">ש׳</div>
+        </div>
+        <div class="chart-legend">
+          <span><span class="legend-dot" style="background:var(--purple)"></span>רמת אנרגיה</span>
+          <span><span class="legend-dot" style="background:#22c55e"></span>איכות שינה</span>
+        </div>
+      </div>
+
+      <!-- Daily report -->
+      <div class="card">
+        <div class="card-label">דיווח יומי</div>
+        <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px">הדיווח שלך עוזר לנו לשפר את הטיפול</p>
+
+        <div class="slider-row">
+          <div class="slider-icon">⚡</div>
+          <div class="slider-info">
+            <h4>רמת אנרגיה</h4>
+            <div class="slider-track"><div class="slider-fill" style="width:50%"></div></div>
+            <div class="slider-ends"><span>תשישות</span><span>אנרגטיות</span></div>
+          </div>
+          <div class="slider-val">5/10</div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-icon">🌙</div>
+          <div class="slider-info">
+            <h4>איכות שינה</h4>
+            <div class="slider-track"><div class="slider-fill" style="width:50%"></div></div>
+            <div class="slider-ends"><span>גרועה</span><span>מעולה</span></div>
+          </div>
+          <div class="slider-val">5/10</div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-icon">🩹</div>
+          <div class="slider-info">
+            <h4>רמת כאב</h4>
+            <div class="slider-track"><div class="slider-fill" style="width:50%"></div></div>
+            <div class="slider-ends"><span>כאב חזק</span><span>ללא כאב</span></div>
+          </div>
+          <div class="slider-val">5/10</div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-icon">🧠</div>
+          <div class="slider-info">
+            <h4>ריכוז</h4>
+            <div class="slider-track"><div class="slider-fill" style="width:50%"></div></div>
+            <div class="slider-ends"><span>קשי להתרכז</span><span>מרוכז מאוד</span></div>
+          </div>
+          <div class="slider-val">5/10</div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-icon">☁️</div>
+          <div class="slider-info">
+            <h4>ערפול מוחי (Brain Fog)</h4>
+            <div class="slider-track"><div class="slider-fill" style="width:50%"></div></div>
+            <div class="slider-ends"><span>כבד מאוד</span><span>צלול לגמרי</span></div>
+          </div>
+          <div class="slider-val">5/10</div>
+        </div>
+        <div class="slider-row">
+          <div class="slider-icon">😊</div>
+          <div class="slider-info">
+            <h4>מצב רוח</h4>
+            <div class="slider-track"><div class="slider-fill" style="width:50%"></div></div>
+            <div class="slider-ends"><span>ירוד</span><span>מצוין</span></div>
+          </div>
+          <div class="slider-val">5/10</div>
+        </div>
+
+        <button class="send-btn">📨 שלח דיווח יומי</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function showTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
