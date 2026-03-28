@@ -20,7 +20,7 @@
       --muted: #6b7280;
       --border: #e5e7eb;
       --header-h: 64px;
-      --subnav-h: 52px;
+      --sidebar-w: 220px;
     }
 
     body {
@@ -35,7 +35,7 @@
     ══════════════════════════════ */
     header {
       position: fixed;
-      top: 0; left: 0; right: 0;
+      top: 0; left: 0; right: var(--sidebar-w);
       height: var(--header-h);
       background: var(--card);
       border-bottom: 1px solid var(--border);
@@ -91,27 +91,28 @@
     }
 
     /* ══════════════════════════════
-       SUB-NAV  (tab links)
+       RIGHT SIDEBAR  (tab links)
     ══════════════════════════════ */
     .subnav {
       position: fixed;
       top: var(--header-h);
-      left: 0; right: 0;
-      height: var(--subnav-h);
+      right: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
       background: var(--card);
-      border-bottom: 1px solid var(--border);
+      border-left: 1px solid var(--border);
       display: flex;
-      align-items: center;
-      padding: 0 40px;
-      gap: 4px;
+      flex-direction: column;
+      padding: 24px 0;
+      gap: 2px;
       z-index: 100;
     }
     .nav-link {
       display: flex;
       align-items: center;
-      gap: 7px;
-      padding: 8px 18px;
-      border-radius: 10px;
+      gap: 12px;
+      padding: 12px 24px;
+      border-radius: 0;
       border: none;
       background: transparent;
       color: var(--muted);
@@ -120,33 +121,32 @@
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
       white-space: nowrap;
+      width: 100%;
+      text-align: right;
     }
     .nav-link:hover { background: var(--purple-light); color: var(--purple); }
     .nav-link.active {
       background: var(--purple-light);
       color: var(--purple);
       font-weight: 700;
+      border-right: 4px solid var(--purple);
     }
-    .nav-link .dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--purple);
-      display: none;
-    }
-    .nav-link.active .dot { display: block; }
+    .nav-link .dot { display: none; }
     .subnav-spacer { flex: 1; }
     .nav-add-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 18px;
+      margin: 0 16px 8px;
+      padding: 12px;
       background: var(--purple-gradient);
       color: #fff;
       border: none;
-      border-radius: 10px;
-      font-size: 0.88rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
     .nav-add-btn:hover { opacity: 0.9; }
 
@@ -154,10 +154,10 @@
        PAGE CONTENT  (from v2.html)
     ══════════════════════════════ */
     .page {
-      padding-top: calc(var(--header-h) + var(--subnav-h) + 32px);
+      padding-top: calc(var(--header-h) + 32px);
       padding-bottom: 48px;
       padding-left: 40px;
-      padding-right: 40px;
+      padding-right: calc(var(--sidebar-w) + 40px);
       max-width: 1400px;
       margin: 0 auto;
     }
